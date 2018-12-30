@@ -14,4 +14,7 @@ setup(name='ranked-vote-import',
               'import_rcv = ranked_vote_import.bin.import_rcv_data:main'
           ]
       },
+      install_requires=[
+          'pandas>=0.23.4'
+      ]
      )

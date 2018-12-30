@@ -54,6 +54,8 @@ class BallotRecord(NamedTuple):
 
 
 class SanFranciscoImporter(BaseReader):
+    format_name = 'us.ca.sf'
+
     @property
     def candidates(self):
         return [str(c) for c in self._candidates[self._contest].values()]
@@ -95,7 +97,7 @@ class SanFranciscoImporter(BaseReader):
                 if master_record.is_writein:
                     self._candidates[master_record.contest_id][master_record.record_id] = WRITE_IN
                 else:
-                    self._candidates[master_record.contest_id][master_record.record_id] = Candidate(
+                    self._candidates[master_record.contest_id][master_record.record_id] = Candidate.get(
                         master_record.description)
 
         self.ballots = self._read_ballots(BallotRecord.parse(b) for b in ballot_image_fh)

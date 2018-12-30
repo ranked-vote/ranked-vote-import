@@ -29,6 +29,7 @@ class BaseReader(ABC):
             'num_ballots': self.num_ballots,
             'candidates': [str(c) for c in self.candidates],
             'files': self.files,
+            'format': self.format_name,
         }
 
     @abstractmethod
@@ -47,3 +48,8 @@ class BaseReader(ABC):
 
     def __iter__(self):
         return self
+
+    @property
+    @abstractmethod
+    def format_name(self) -> str:
+        pass

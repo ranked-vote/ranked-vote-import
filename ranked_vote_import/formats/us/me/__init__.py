@@ -6,10 +6,12 @@ import pandas as pd
 
 
 class MaineImporter(BaseReader):
+    format_name = 'us.me'
+
     def __init__(self, files: List[str]):
         super(MaineImporter, self).__init__(files)
         self.ballots = self._read_raw_ballots(files)
-        self._candidates = dict() # type: Dict[str, Candidate]
+        self._candidates = dict()  # type: Dict[str, Candidate]
 
     @property
     def candidates(self):
@@ -48,7 +50,7 @@ class MaineImporter(BaseReader):
         else:
             candidate = MaineImporter.fix_string(choice_str)
             if candidate not in self._candidates:
-                self._candidates[candidate] = Candidate(candidate)
+                self._candidates[candidate] = Candidate.get(candidate)
             return self._candidates[candidate]
 
     def _read_raw_ballots(self, files) -> Iterator[Ballot]:
