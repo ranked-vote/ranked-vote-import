@@ -1,8 +1,32 @@
 from typing import TextIO, List, Iterator, NamedTuple, Dict, DefaultDict
 from ranked_vote.ballot import Ballot, UNDERVOTE, OVERVOTE, Candidate, Choice, WRITE_IN
 from ranked_vote_import.base_reader import BaseReader
+from ranked_vote_import.base_normalizer import BaseNormalizer
 import re
 import pandas as pd
+
+
+class MaineNormalizer(BaseNormalizer):
+    def normalize(self, ballot: Ballot) -> Ballot:
+        normalized_choices = list()
+        seen = set()
+        last_was_undervote = False
+        for choice in ballot.choices:
+            if choice == UNDERVOTE:
+                if last_was_undervote:
+                    normalized_choices.append(UNDERVOTE)
+                    break
+                last_was_undervote = True
+            elif choice == OVERVOTE:
+                normalized_choices.append(OVERVOTE)
+                break
+            elif choice not in seen:
+                last_was_undervote = False
+                normalized_choices.append(choice)
+                seen.add(choice)
+        while len(normalized_choices) < len(ballot.choices):
+            normalized_choices.append(UNDERVOTE)
+        return Ballot(ballot.ballot_id, normalized_choices)
 
 
 class MaineImporter(BaseReader):
