@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from ranked_vote.ballot import Ballot, Candidate
-from typing import TextIO, List
+from typing import List
 
 
 class BaseReader(ABC):
@@ -11,7 +11,7 @@ class BaseReader(ABC):
             'name': filename,
             'sha1': ''
         } for filename in files]
-        self.file_handles = (open(f) for f in files)
+        self.file_handles = [open(f) for f in files]
 
     def close_open_files(self):
         self.done_reading = True
@@ -27,7 +27,7 @@ class BaseReader(ABC):
         assert self.done_reading
         return {
             'num_ballots': self.num_ballots,
-            'candidates': self.candidates,
+            'candidates': [str(c) for c in self.candidates],
             'files': self.files,
         }
 
