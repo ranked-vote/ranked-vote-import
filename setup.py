@@ -16,6 +16,6 @@ setup(name='ranked-vote-import',
       },
       install_requires=[
           'pandas>=0.23.4',
-          'ranked_vote>=0.0.1'
+          'ranked-vote>=0.0.1'
       ]
      )
