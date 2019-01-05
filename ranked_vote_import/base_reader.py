@@ -1,6 +1,14 @@
 from abc import ABC, abstractmethod
 from ranked_vote.ballot import Ballot, Candidate
 from typing import List
+import hashlib
+
+
+def get_file_sha1(filename):
+    with open(filename, 'rb') as fh:
+        h = hashlib.sha1()
+        h.update(fh.read())
+        return h.hexdigest()
 
 
 class BaseReader(ABC):
@@ -9,7 +17,7 @@ class BaseReader(ABC):
         self.done_reading = False
         self.files = [{
             'name': filename,
-            'sha1': ''
+            'sha1': get_file_sha1(filename)
         } for filename in files]
         self.file_handles = [open(f) for f in files]
 

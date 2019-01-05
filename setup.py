@@ -11,7 +11,7 @@ setup(name='ranked-vote-import',
       packages=['ranked_vote_import'],
       entry_points={
           'console_scripts': [
-              'import_rcv = ranked_vote_import.bin.import_rcv_data:main'
+              'rcv-import = ranked_vote_import.bin.import_rcv_data:main'
           ]
       },
       install_requires=[

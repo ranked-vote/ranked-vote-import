@@ -1,5 +1,5 @@
 import argparse
-from ranked_vote_import import FORMATS
+from ranked_vote_import import FORMATS, NORMALIZERS
 from ranked_vote.format import write_ballots_fh
 from sys import stdout, stderr
 import gzip
@@ -12,11 +12,14 @@ TERMINAL_GREEN = '\033[92m'
 FORMAT_METADATA = TERMINAL_BOLD + TERMINAL_GREEN + '  {}: ' + TERMINAL_RESET + '{}'
 
 
-def import_rcv_data(input_format, files, output):
+def import_rcv_data(input_format, files, output, normalize=False):
     if input_format not in FORMATS:
         raise ValueError('Format {} not understood.'.format(input_format))
 
-    reader = FORMATS[input_format](files)
+    ballots = reader = FORMATS[input_format](files)
+    if normalize:
+        normalizer = NORMALIZERS[input_format]()
+        ballots = (normalizer.normalize(ballot) for ballot in reader)
 
     if output is None:
         fh = stdout
@@ -35,9 +38,10 @@ def import_rcv_data(input_format, files, output):
     if output is not None:
         print('Writing data to {} and writing metadata to {}.'.format(output, meta_file), file=stderr)
 
-    write_ballots_fh(fh, reader)
+    write_ballots_fh(fh, ballots)
 
     metadata = reader.get_metadata()
+    metadata['normalized'] = normalize
 
     if meta_file is not None:
         with open(meta_file, 'w') as meta_fh:
@@ -45,13 +49,19 @@ def import_rcv_data(input_format, files, output):
 
     print(TERMINAL_BOLD + TERMINAL_GREEN + 'Done Converting.' + TERMINAL_RESET, file=stderr)
     for mk, mv in metadata.items():
-        print(FORMAT_METADATA.format(mk, mv), file=stderr)
+        if isinstance(mv, list):
+            print(FORMAT_METADATA.format(mk, ''), file=stderr)
+            for item in mv:
+                print('    ' + str(item), file=stderr)
+        else:
+            print(FORMAT_METADATA.format(mk, mv), file=stderr)
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('input_format')
     parser.add_argument('files', nargs='+')
+    parser.add_argument('--normalize', action='store_true')
     parser.add_argument('-o', '--output')
 
     import_rcv_data(**vars(parser.parse_args()))
