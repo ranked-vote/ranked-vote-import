@@ -48,7 +48,6 @@ def import_rcv_data(input_format, files, output):
         print(FORMAT_METADATA.format(mk, mv), file=stderr)
 
 
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('input_format')

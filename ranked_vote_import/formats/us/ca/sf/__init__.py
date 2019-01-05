@@ -1,8 +1,10 @@
-from typing import TextIO, List, Iterator, NamedTuple, Dict, DefaultDict
+from collections import defaultdict
+
+from itertools import groupby
+from typing import List, Iterator, NamedTuple, Dict, DefaultDict
+
 from ranked_vote.ballot import Ballot, UNDERVOTE, OVERVOTE, Candidate, Choice, WRITE_IN
 from ranked_vote_import.base_reader import BaseReader
-from collections import defaultdict
-from itertools import groupby
 
 
 class MasterRecord(NamedTuple):

@@ -39,5 +39,10 @@ class TestUSME(TestCase):
 
         self.assertEqual(
             Ballot('332', [Candidate('A'), Candidate('B'), Candidate('C'), UNDERVOTE, UNDERVOTE]),
-            normalizer.normalize(Ballot('332', [Candidate('A'), Candidate('A'), Candidate('B'), Candidate('C'), Candidate('B')]))
+            normalizer.normalize(Ballot('332', [
+                Candidate('A'),
+                Candidate('A'),
+                Candidate('B'),
+                Candidate('C'),
+                Candidate('B')]))
         )

@@ -1,9 +1,10 @@
-from typing import TextIO, List, Iterator, NamedTuple, Dict, DefaultDict
-from ranked_vote.ballot import Ballot, UNDERVOTE, OVERVOTE, Candidate, Choice, WRITE_IN
-from ranked_vote_import.base_reader import BaseReader
-from ranked_vote_import.base_normalizer import BaseNormalizer
-import re
 import pandas as pd
+import re
+from typing import List, Iterator, Dict
+
+from ranked_vote.ballot import Ballot, UNDERVOTE, OVERVOTE, Candidate, WRITE_IN
+from ranked_vote_import.base_normalizer import BaseNormalizer
+from ranked_vote_import.base_reader import BaseReader
 
 
 class MaineNormalizer(BaseNormalizer):
@@ -54,7 +55,7 @@ class MaineImporter(BaseReader):
         n_choices = 0
         choice_columns = list()
         for c in df.columns:
-            match = re.match('.+ (\d+)(?:st|nd|rd|th) Choice', c)
+            match = re.match(r'.+ (\d+)(?:st|nd|rd|th) Choice', c)
             if match:
                 rank = int(match.groups()[0])
                 assert rank == n_choices + 1
