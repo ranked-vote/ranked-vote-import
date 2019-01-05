@@ -5,6 +5,29 @@ from typing import List, Iterator, NamedTuple, Dict, DefaultDict
 
 from ranked_vote.ballot import Ballot, UNDERVOTE, OVERVOTE, Candidate, Choice, WRITE_IN
 from ranked_vote_import.base_reader import BaseReader
+from ranked_vote_import.base_normalizer import BaseNormalizer
+
+
+class SanFranciscoNormalizer(BaseNormalizer):
+    def normalize(self, ballot: Ballot) -> Ballot:
+        normalized_choices = list()
+        seen = set()
+        for choice in ballot.choices:
+            if choice == UNDERVOTE:
+                # San Francisco Charter 13.102.a: If a voter casts a ranked-choice ballot but skips a rank, the voter's
+                # vote shall be transferred to that voter's next ranked choice.
+                pass
+            elif choice == OVERVOTE:
+                # San Francisco Charter 13.102.a: If a ranked-choice ballot gives equal rank to two or more candidates,
+                # the ballot shall be declared exhausted when such multiple rankings are reached.
+                normalized_choices.append(OVERVOTE)
+                break
+            elif choice not in seen:
+                normalized_choices.append(choice)
+                seen.add(choice)
+        while len(normalized_choices) < len(ballot.choices):
+            normalized_choices.append(UNDERVOTE)
+        return Ballot(ballot.ballot_id, normalized_choices)
 
 
 class MasterRecord(NamedTuple):
