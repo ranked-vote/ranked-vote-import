@@ -79,34 +79,38 @@ class BallotRecord(NamedTuple):
 
 
 class SanFranciscoImporter(BaseReader):
-    format_name = 'us.ca.sf'
+    format_name = 'us.ca.sfo'
 
     @property
     def candidates(self):
         return [str(c) for c in self._candidates[self._contest].values()]
 
     def _read_ballots(self, ballots: Iterator[BallotRecord]) -> Iterator[Ballot]:
-        for ballot_id, ballot_records in groupby(ballots, lambda x: x.pref_voter_id):
+        for (ballot_id, contest_id), ballot_records in groupby(ballots, lambda x: (x.pref_voter_id, x.contest_id)):
             choices = list()  # type: List[Choice]
-            for ballot_record in ballot_records:
-                if self._contest:
-                    assert self._contest == ballot_record.contest_id
-                else:
-                    self._contest = ballot_record.contest_id
+            if 'contest' in self._params:
+                if contest_id != self._params['contest']:
+                    continue
+            elif self._contest:
+                assert self._contest == contest_id
+            else:
+                self._contest = contest_id
 
+            for ballot_record in ballot_records:
                 if ballot_record.under_vote:
                     choices.append(UNDERVOTE)
                 elif ballot_record.over_vote:
                     choices.append(OVERVOTE)
                 else:
-                    choices.append(self._candidates[self._contest][ballot_record.candidate_id])
+                    choices.append(self._candidates[ballot_record.contest_id][ballot_record.candidate_id])
             yield Ballot(str(ballot_id), choices)
 
-    def __init__(self, files: List[str]):
+    def __init__(self, files: List[str], params: Dict):
         super(SanFranciscoImporter, self).__init__(files)
 
         master_lookup_fh, ballot_image_fh = self.file_handles
 
+        self._params = params
         self._candidates = defaultdict(dict)  # type: DefaultDict[int, Dict[int, Choice]]
         self._contests = dict()  # type: Dict[int, str]
         self._contest = None

@@ -4,6 +4,7 @@ from ranked_vote.format import write_ballots_fh
 from sys import stdout, stderr
 import gzip
 import json
+from typing import Dict
 
 TERMINAL_RESET = '\033[0m'
 TERMINAL_BOLD = '\033[1m'
@@ -12,11 +13,11 @@ TERMINAL_GREEN = '\033[92m'
 FORMAT_METADATA = TERMINAL_BOLD + TERMINAL_GREEN + '  {}: ' + TERMINAL_RESET + '{}'
 
 
-def import_rcv_data(input_format, files, output, normalize=False):
+def import_rcv_data(input_format, files, output, normalize=False, params: Dict = None):
     if input_format not in FORMATS:
         raise ValueError('Format {} not understood.'.format(input_format))
 
-    ballots = reader = FORMATS[input_format](files)
+    ballots = reader = FORMATS[input_format](files, params)
     if normalize:
         normalizer = NORMALIZERS[input_format]()
         ballots = (normalizer.normalize(ballot) for ballot in reader)
@@ -62,6 +63,7 @@ def main():
     parser.add_argument('input_format')
     parser.add_argument('files', nargs='+')
     parser.add_argument('--normalize', action='store_true')
+    parser.add_argument('--params', type=json.loads, default=dict())
     parser.add_argument('-o', '--output')
 
     import_rcv_data(**vars(parser.parse_args()))

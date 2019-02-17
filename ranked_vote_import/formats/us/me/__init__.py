@@ -33,7 +33,7 @@ class MaineNormalizer(BaseNormalizer):
 class MaineImporter(BaseReader):
     format_name = 'us.me'
 
-    def __init__(self, files: List[str]):
+    def __init__(self, files: List[str], _params: Dict):
         super(MaineImporter, self).__init__(files)
         self.ballots = self._read_raw_ballots(files)
         self._candidates = dict()  # type: Dict[str, Candidate]
