@@ -131,8 +131,16 @@ class SanFranciscoImporter(BaseReader):
                     if master_record.description == 'WRITE-IN':
                         self._candidates[master_record.contest_id][master_record.record_id] = WRITE_IN
                     else:
+                        candidate_name = master_record.description
+                        if candidate_name.startswith('WRITE-IN - '):
+                            write_in = True
+                            name = candidate_name.replace('WRITE-IN - ', '').title()
+                        else:
+                            write_in = False
+                            name = candidate_name.title()
+
                         self._candidates[master_record.contest_id][master_record.record_id] = Candidate.get(
-                            master_record.description)
+                            master_record.description, name=name, write_in=write_in)
 
         self.ballots = self._read_ballots(ballot_image_file)
 

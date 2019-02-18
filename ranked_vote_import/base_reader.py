@@ -40,7 +40,7 @@ class BaseReader(ABC):
         assert self.done_reading
         return {
             'num_ballots': self.num_ballots,
-            'candidates': [str(c) for c in self.candidates],
+            'candidate_ids': [str(c) for c in self.candidates],
             'files': self.files,
             'format': self.format_name,
         }
