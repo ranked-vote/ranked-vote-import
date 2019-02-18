@@ -1,6 +1,7 @@
 from typing import Dict, Type
-from ranked_vote_import.base_reader import BaseReader
+
 from ranked_vote_import.base_normalizer import BaseNormalizer
+from ranked_vote_import.base_reader import BaseReader
 from ranked_vote_import.formats.us.ca.sfo import SanFranciscoImporter, SanFranciscoNormalizer
 from ranked_vote_import.formats.us.me import MaineImporter, MaineNormalizer
 

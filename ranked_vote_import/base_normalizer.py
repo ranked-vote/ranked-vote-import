@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from ranked_vote.ballot import Ballot
 
 

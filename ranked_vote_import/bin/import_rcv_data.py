@@ -1,10 +1,11 @@
 import argparse
-from ranked_vote_import import FORMATS, NORMALIZERS
-from ranked_vote.format import write_ballots_fh
-from sys import stdout, stderr
-import gzip
 import json
+import re
+from sys import stdout, stderr
 from typing import Dict
+
+from ranked_vote.format import write_ballots, write_ballots_fh
+from ranked_vote_import import FORMATS, NORMALIZERS
 
 TERMINAL_RESET = '\033[0m'
 TERMINAL_BOLD = '\033[1m'
@@ -23,23 +24,12 @@ def import_rcv_data(input_format, files, output, normalize=False, params: Dict =
         ballots = (normalizer.normalize(ballot) for ballot in reader)
 
     if output is None:
-        fh = stdout
-        meta_file = None
         print('Writing data to stdout and not writing metadata.', file=stderr)
-    elif output.endswith('.csv.gz'):
-        fh = gzip.open(output, 'wt')
-        meta_file = output[:-7] + '.json'
-    elif output.endswith('.csv'):
-        fh = open(output, 'w')
-        meta_file = output[:-4] + '.json'
+        write_ballots_fh(stdout, ballots)
+        meta_file = None
     else:
-        print('Invalid file extension (use .csv or .csv.gz).', file=stderr)
-        return exit(1)
-
-    if output is not None:
-        print('Writing data to {} and writing metadata to {}.'.format(output, meta_file), file=stderr)
-
-    write_ballots_fh(fh, ballots)
+        write_ballots(output, ballots)
+        meta_file = re.sub(r'\.csv(\.gz)?$', '', output) + '.json'
 
     metadata = reader.get_metadata()
     metadata['normalized'] = normalize

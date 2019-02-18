@@ -1,7 +1,9 @@
-from abc import ABC, abstractmethod
-from ranked_vote.ballot import Ballot, Candidate
-from typing import List
 import hashlib
+from abc import ABC, abstractmethod
+from os.path import join
+from typing import List, Dict
+
+from ranked_vote.ballot import Ballot, Candidate
 
 
 def get_file_sha1(filename):
@@ -12,19 +14,22 @@ def get_file_sha1(filename):
 
 
 class BaseReader(ABC):
-    def __init__(self, files: List[str]):
+    _params: Dict
+
+    def __init__(self, files: List[str], params: Dict, base_dir: str = '.'):
+        self._params = params
         self.num_ballots = 0
         self.done_reading = False
+        self.filenames = [join(base_dir, f) for f in files]
         self.files = [{
             'name': filename,
             'sha1': get_file_sha1(filename)
-        } for filename in files]
-        self.file_handles = [open(f) for f in files]
+        } for filename in self.filenames]
+        self.read()
 
-    def close_open_files(self):
-        self.done_reading = True
-        for fh in self.file_handles:
-            fh.close()
+    @abstractmethod
+    def read(self):
+        pass
 
     @property
     @abstractmethod
@@ -51,7 +56,7 @@ class BaseReader(ABC):
             self.num_ballots += 1
             return ballot
         except StopIteration:
-            self.close_open_files()
+            self.done_reading = True
             raise
 
     def __iter__(self):

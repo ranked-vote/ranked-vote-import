@@ -1,6 +1,7 @@
-import pandas as pd
 import re
 from typing import List, Iterator, Dict
+
+import pandas as pd
 
 from ranked_vote.ballot import Ballot, UNDERVOTE, OVERVOTE, Candidate, WRITE_IN
 from ranked_vote_import.base_normalizer import BaseNormalizer
@@ -31,11 +32,12 @@ class MaineNormalizer(BaseNormalizer):
 
 
 class MaineImporter(BaseReader):
-    format_name = 'us.me'
+    format_name = 'us_me'
+    ballots: Iterator[Ballot]
+    _candidates: Dict[str, Candidate]
 
-    def __init__(self, files: List[str], _params: Dict):
-        super(MaineImporter, self).__init__(files)
-        self.ballots = self._read_raw_ballots(files)
+    def read(self):
+        self.ballots = self._read_raw_ballots(self.filenames)
         self._candidates = dict()  # type: Dict[str, Candidate]
 
     @property
@@ -78,7 +80,7 @@ class MaineImporter(BaseReader):
                 self._candidates[candidate] = Candidate.get(candidate)
             return self._candidates[candidate]
 
-    def _read_raw_ballots(self, files) -> Iterator[Ballot]:
+    def _read_raw_ballots(self, files: List[str]) -> Iterator[Ballot]:
         for filename in files:
             data = pd.read_excel(filename)
             data, choice_columns = MaineImporter.normalize_columns(data)
