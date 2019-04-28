@@ -1,12 +1,11 @@
-from typing import List, Iterator, NamedTuple, Dict, DefaultDict
-
-from ranked_vote.ballot import Ballot, UNDERVOTE, OVERVOTE, Candidate, Choice, WRITE_IN
-from ranked_vote_import.base_normalizer import BaseNormalizer
-from ranked_vote_import.base_reader import BaseReader
-
-import zipfile
 import csv
 import io
+import zipfile
+from typing import Iterator
+
+from ranked_vote.ballot import Ballot, UNDERVOTE, OVERVOTE, Candidate
+from ranked_vote_import.base_normalizer import BaseNormalizer
+from ranked_vote_import.base_reader import BaseReader
 
 
 class SantaFeNormalizer(BaseNormalizer):
