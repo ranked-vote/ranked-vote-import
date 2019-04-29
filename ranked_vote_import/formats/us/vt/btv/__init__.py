@@ -26,7 +26,7 @@ class BurlingtonNormalizer(BaseNormalizer):
 
 
 class BurlingtonImporter(BaseReader):
-    format_name = 'us_vt_bvt'
+    format_name = 'us_vt_btv'
     ballots: Iterator[Ballot]
 
     @property
